@@ -1,13 +1,18 @@
 #include <iostream>
+#include <algorithm>
 #include <miniaudio.h>
 #include "StreamDataSource.h"
 #include "Context.h"
+#include "MAWrapper.h"
 
 namespace se::audio {
 
 	struct StreamDataSource::MaDataSource
 	{
 		ma_data_source_base base;
+		ma_format format;
+		uint32_t sampleRate;
+		std::vector<ma_channel> channels;
 
 		MaDataSource();
 		~MaDataSource();
@@ -76,13 +81,21 @@ namespace se::audio {
 		ma_data_source* pDataSource, ma_format* pFormat, ma_uint32* pChannels, ma_uint32* pSampleRate,
 		ma_channel* pChannelMap, size_t channelMapCap
 	) {
-		// TODO: Return the format of the data here.
+		if (!pDataSource) {
+			return MA_ERROR;
+		}
 
+		auto pThis = static_cast<MaDataSource*>(pDataSource);
+		std::size_t channelCount = std::min(pThis->channels.size(), channelMapCap);
 
-		
+		*pFormat = pThis->format;
+		*pSampleRate = pThis->sampleRate;
+		*pChannels = static_cast<ma_uint32>(channelCount);
+		for (std::size_t i = 0; i < channelCount; ++i) {
+			pChannelMap[i] = pThis->channels[i];
+		}
 
-
-		return MA_ERROR;
+		return MA_SUCCESS;
 	}
 
 
@@ -132,6 +145,31 @@ namespace se::audio {
 	ma_data_source* StreamDataSource::getMADataSource() const
 	{
 		return static_cast<ma_data_source*>(mMaDataSource.get());
+	}
+
+
+	StreamDataSource& StreamDataSource::setFormat(Format format)
+	{
+		mMaDataSource->format = toMAFormat(format);
+		return *this;
+	}
+
+
+	StreamDataSource& StreamDataSource::setSampleRate(uint32_t sampleRate)
+	{
+		mMaDataSource->sampleRate = sampleRate;
+		return *this;
+	}
+
+
+	StreamDataSource& StreamDataSource::setChannels(const Channel* channels, std::size_t channelCount)
+	{
+		mMaDataSource->channels.reserve(channelCount);
+		for (std::size_t i = 0; i < channelCount; ++i) {
+			mMaDataSource->channels.push_back( toMAChannel(channels[i]) );
+		}
+
+		return *this;
 	}
 
 

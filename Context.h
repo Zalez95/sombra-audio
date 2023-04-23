@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <vector>
+#include "Constants.h"
 
 struct ma_context;
 struct ma_device;
@@ -49,9 +50,9 @@ namespace se::audio {
 	class Context
 	{
 	public:		// Nested types
-		/** Struct CreateConfig, holds all the parameters needed for
+		/** Struct ContextConfig, holds all the parameters needed for
 		 * initializing the Context */
-		struct CreateConfig
+		struct ContextConfig
 		{
 			/** The default LogHandler */
 			static LogHandler sDefaultLogHandler;
@@ -59,6 +60,15 @@ namespace se::audio {
 			/** A pointer to the LogHandler that will be used for printing logs
 			 * by the Context */
 			LogHandler* logHandler = &sDefaultLogHandler;
+		};
+
+		/** Struct DeviceConfig, holds all the parameters needed for
+		 * setting the Device */
+		struct DeviceConfig
+		{
+			Format decodeFormat = Format::f32;
+			uint32_t decodeChannels = 0;
+			uint32_t decodeSampleRate = 48000;
 		};
 
 		/** Class IDeviceDataListener, it's the interface that should be
@@ -115,7 +125,7 @@ namespace se::audio {
 		 *
 		 * @param	config the parameters of the Context
 		 * @return	true on success, false otherwise */
-		static bool start(const CreateConfig& config);
+		static bool start(const ContextConfig& config);
 
 		/** @return	all the sound devices that can be used */
 		static std::vector<DeviceInfo> getDevices();
@@ -123,8 +133,9 @@ namespace se::audio {
 		/** Sets the audio device to use within the Context @see getDevices
 		 *
 		 * @param	deviceId the id of the Device to use
+		 * @param	config the parameters of the Device
 		 * @return	true on success, false otherwise */
-		static bool setDevice(std::size_t deviceId);
+		static bool setDevice(std::size_t deviceId, const DeviceConfig& config);
 
 		/** Adds the given IDeviceDataListener to the Context
 		 *

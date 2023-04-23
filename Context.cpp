@@ -3,13 +3,9 @@
 #define MINIAUDIO_IMPLEMENTATION
 #include <miniaudio.h>
 #include "Context.h"
+#include "MAWrapper.h"
 
 namespace se::audio {
-
-	static constexpr ma_format kDecodeFormat = ma_format_f32;
-	static constexpr uint32_t kDecodeChannels = 0;				// native channel count
-	static constexpr uint32_t kDecodeSampleRate = 48000;
-
 
 	struct Context::Impl
 	{
@@ -32,7 +28,7 @@ namespace se::audio {
 		/** Creates a new Context Impl
 		 *
 		 * @param	config the parameters of the Context Impl */
-		Impl(const CreateConfig& config);
+		Impl(const ContextConfig& config);
 
 		/** Class destructor */
 		~Impl();
@@ -40,7 +36,7 @@ namespace se::audio {
 
 
 	Context::Impl* Context::sImpl = nullptr;
-	LogHandler Context::CreateConfig::sDefaultLogHandler = {};
+	LogHandler Context::ContextConfig::sDefaultLogHandler = {};
 
 
 	static void myMALogCallback(void*, ma_uint32 level, const char* pMessage)
@@ -65,7 +61,7 @@ namespace se::audio {
 	}
 
 
-	Context::Impl::Impl(const CreateConfig& config) : logHandler(config.logHandler)
+	Context::Impl::Impl(const ContextConfig& config) : logHandler(config.logHandler)
 	{
 		// Create the miniaudio log
 		maLog = std::make_unique<ma_log>();
@@ -140,7 +136,7 @@ namespace se::audio {
 	}
 
 
-	bool Context::start(const CreateConfig& config)
+	bool Context::start(const ContextConfig& config)
 	{
 		sImpl = new Impl(config);
 		if (!getMAContext()) {
@@ -175,7 +171,7 @@ namespace se::audio {
 	}
 
 
-	bool Context::setDevice(std::size_t deviceId)
+	bool Context::setDevice(std::size_t deviceId, const DeviceConfig& config)
 	{
 		getLogHandler()->debug(("setDevice(" + std::to_string(deviceId) + ")").c_str());
 
@@ -190,9 +186,9 @@ namespace se::audio {
 		ma_device_config deviceConfig;
 		deviceConfig = ma_device_config_init(ma_device_type_playback);
 		deviceConfig.playback.pDeviceID = &deviceInfos[deviceId].id;
-		deviceConfig.playback.format = kDecodeFormat;
-		deviceConfig.playback.channels = kDecodeChannels;
-		deviceConfig.sampleRate = kDecodeSampleRate;
+		deviceConfig.playback.format = toMAFormat(config.decodeFormat);
+		deviceConfig.playback.channels = config.decodeChannels;
+		deviceConfig.sampleRate = config.decodeSampleRate;
 		deviceConfig.dataCallback = &maDeviceDataCallback;
 		deviceConfig.pUserData = sImpl;
 

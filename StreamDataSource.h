@@ -3,6 +3,7 @@
 
 #include <memory>
 #include "IDataSource.h"
+#include "Constants.h"
 
 namespace se::audio {
 
@@ -40,6 +41,27 @@ namespace se::audio {
 
 		/** @copydoc IDataSource::getMADataSource() */
 		virtual ma_data_source* getMADataSource() const;
+
+		/** Sets the format of the StreamDataSource
+		 *
+		 * @param	format the format of the StreamDataSource
+		 * @return	a reference to the current StreamDataSource */
+		StreamDataSource& setFormat(Format format);
+
+		/** Sets the sample rate of the StreamDataSource
+		 *
+		 * @param	sampleRate the sample rate of the StreamDataSource
+		 * @return	a reference to the current StreamDataSource */
+		StreamDataSource& setSampleRate(uint32_t sampleRate);
+
+		/** Sets the channels of the StreamDataSource
+		 *
+		 * @param	channels a pointer to the channels of the StreamDataSource
+		 * @param	channelCount the number of channels
+		 * @return	a reference to the current StreamDataSource */
+		StreamDataSource& setChannels(
+			const Channel* channels, std::size_t channelCount
+		);
 
 		void onData(const unsigned char* data, std::size_t samplesSize);
 	};
