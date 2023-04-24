@@ -19,6 +19,19 @@ namespace se::audio {
 	}
 
 
+	constexpr uint32_t bytesPerMAFormat(Format format)
+	{
+		switch (format) {
+			case Format::u8:					return 1u;
+			case Format::s16:					return 2u;
+			case Format::s24:					return 3u;
+			case Format::s32:					return 4u;
+			case Format::f32:					return 4u;
+			default:							return 0u;
+		}
+	}
+
+
 	constexpr ma_channel toMAChannel(Channel channel)
 	{
 		switch (channel) {

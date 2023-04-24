@@ -17,6 +17,7 @@ namespace se::audio {
 	class StreamDataSource : public IDataSource
 	{
 	private:	// Nested types
+		struct CircularBuffer;
 		struct MaDataSource;
 
 	private:	// Attributes
@@ -24,8 +25,11 @@ namespace se::audio {
 		std::unique_ptr<MaDataSource> mMaDataSource;
 
 	public:		// Functions
-		/** Creates a new DataSource */
-		StreamDataSource();
+		/** Creates a new DataSource
+		 *
+		 * @param	bufferedSamples the number of buffered samples in the
+		 *			StreamDataSource. It must be at least 2 */
+		StreamDataSource(std::size_t bufferedSamples);
 		StreamDataSource(const StreamDataSource& other) = delete;
 		StreamDataSource(StreamDataSource&& other);
 
@@ -54,6 +58,12 @@ namespace se::audio {
 		 * @return	a reference to the current StreamDataSource */
 		StreamDataSource& setSampleRate(uint32_t sampleRate);
 
+		/** Sets the number of channels of the StreamDataSource
+		 *
+		 * @param	numChannels the number of channels
+		 * @return	a reference to the current StreamDataSource */
+		StreamDataSource& setNumChannels(int numChannels);
+
 		/** Sets the channels of the StreamDataSource
 		 *
 		 * @param	channels a pointer to the channels of the StreamDataSource
@@ -63,7 +73,14 @@ namespace se::audio {
 			const Channel* channels, std::size_t channelCount
 		);
 
-		void onData(const unsigned char* data, std::size_t samplesSize);
+		/** Adds the given data to the StreamDataSource so it can be played
+		 *
+		 * @param	data the new data of the StreamDataSource
+		 * @param	numSamples the number of samples in data
+		 * @return	a reference to the current StreamDataSource */
+		StreamDataSource& onNewSamples(
+			const unsigned char* data, std::size_t numSamples
+		);
 	};
 
 }

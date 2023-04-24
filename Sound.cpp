@@ -47,12 +47,12 @@ namespace se::audio {
 		ma_engine* engine = ma_sound_get_engine(other.mSound.get());
 		ma_result res = ma_sound_init_copy(engine, other.mSound.get(), 0, nullptr, mSound.get());
 		if (res != MA_SUCCESS) {
-			Context::getLogHandler()->error("Failed to create the sound");
+			Context::getLogHandler()->error("operator= Failed to create the sound");
 			mSound = nullptr;
 			return *this;
 		}
 
-		std::cout << "Created Sound " << mSound.get() << std::endl;
+		std::cout << "operator= Created Sound " << mSound.get() << std::endl;
 
 		return *this;
 	}
@@ -199,11 +199,11 @@ namespace se::audio {
 		other.mSound = std::make_unique<ma_sound>();
 		ma_result res = ma_sound_init_from_data_source(engine, dataSource, 0, nullptr, other.mSound.get());
 		if (res != MA_SUCCESS) {
-			Context::getLogHandler()->error("Failed to create the sound");
+			Context::getLogHandler()->error("bind: Failed to create the sound");
 			return;
 		}
 
-		std::cout << "Created Sound " << other.mSound.get() << " with DataSource " << dataSource << std::endl;
+		std::cout << "bind: Created Sound " << other.mSound.get() << " with DataSource " << dataSource << std::endl;
 
 		other.setPosition( getPosition() );
 		other.setOrientation( getOrientation() );
@@ -263,13 +263,13 @@ namespace se::audio {
 
 		ma_result res = ma_sound_init_ex(engine, &soundConfig, mSound.get());
 		if (res != MA_SUCCESS) {
-			Context::getLogHandler()->error("Failed to create the sound");
+			Context::getLogHandler()->error("initInternal: Failed to create the sound");
 			mSound = nullptr;
 			return false;
 		}
 		ma_sound_stop(mSound.get());
 
-		std::cout << "Created Sound " << mSound.get() << std::endl;
+		std::cout << "initInternal: Created Sound " << mSound.get() << std::endl;
 
 		return true;
 	}
