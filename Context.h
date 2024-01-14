@@ -93,8 +93,9 @@ namespace se::audio {
 		/** Holds the info about an audio device */
 		struct DeviceInfo
 		{
-			std::string name;	///< The name of the device
 			std::size_t id;		///< The id of the device
+			std::string name;	///< The name of the device
+			bool isDefault;		///< If it's the default device or not
 		};
 	private:
 		struct Impl;

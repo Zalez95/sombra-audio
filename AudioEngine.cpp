@@ -155,7 +155,7 @@ namespace se::audio {
 			std::ios_base::cur;
 
 		pThis->streams[iSD].stream->clear();
-		pThis->streams[iSD].stream->seekg(offset, ori);		// FIXME: Without seek this doesn't work
+		pThis->streams[iSD].stream->seekg(offset, ori);
 		if (pThis->streams[iSD].stream->fail()) {
 			return MA_ERROR;
 		}

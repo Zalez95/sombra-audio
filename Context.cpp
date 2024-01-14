@@ -159,7 +159,7 @@ namespace se::audio {
 			ma_result result = ma_context_get_devices(getMAContext(), &deviceInfos, &deviceCount, nullptr, nullptr);
 			if (result == MA_SUCCESS) {
 				for (ma_uint32 i = 0; i < deviceCount; ++i) {
-					ret.push_back({ deviceInfos[i].name, i });
+					ret.push_back({ i, deviceInfos[i].name, static_cast<bool>(deviceInfos[i].isDefault) });
 				}
 			}
 			else {
