@@ -13,63 +13,71 @@ namespace se::audio {
 	{
 	private:
 		std::vector<unsigned char> mData;
-		std::size_t mFirstByte = 0, mLastByte = 0;
+		std::size_t mFirstByte = 0, mNumBytes = 0;
 
 	public:
 		CircularBuffer(std::size_t bufferSize = 0) : mData(bufferSize) {};
 
 		bool empty() const
 		{
-			return (mFirstByte == mLastByte);
+			return (mNumBytes == 0);
+		};
+
+		bool full() const
+		{
+			return (mNumBytes == mData.size());
 		};
 
 		std::size_t read(unsigned char* data, std::size_t size)
 		{
 			std::size_t bytesRead = 0;
+			std::size_t rSize = std::min(size, mNumBytes);
 
 			// Copy the last part of the circular buffer
-			if (mLastByte < mFirstByte) {
-				std::size_t bytesToCopy = std::min(mData.size() - mFirstByte, size);
+			if (mData.size() - mFirstByte < rSize) {
+				std::size_t bytesToCopy = mData.size() - mFirstByte;
 				std::memcpy(data, &mData[mFirstByte], bytesToCopy);
 
-				mFirstByte = (mFirstByte + bytesToCopy) % mData.size();
 				bytesRead += bytesToCopy;
+				mNumBytes -= bytesToCopy;
+				mFirstByte = 0;
 			}
 
 			// Copy the first part of the circular buffer
-			std::size_t bytesToCopy = std::min(mLastByte + 1 - mFirstByte, size - bytesRead);
+			std::size_t bytesToCopy = rSize - bytesRead;
 			std::memcpy(data + bytesRead, &mData[mFirstByte], bytesToCopy);
 
-			mFirstByte = (mFirstByte + bytesToCopy) % mData.size();
 			bytesRead += bytesToCopy;
+			mNumBytes -= bytesToCopy;
+			mFirstByte = (mFirstByte + bytesToCopy) % mData.size();
 
 			return bytesRead;
 		};
 
-		void write(const unsigned char* data, std::size_t size)
+		std::size_t write(const unsigned char* data, std::size_t size)
 		{
-			if (!data || (size == 0)) { return; }
-
-			// We can't copy more than the last mData.size() bytes
-			std::size_t rSize = std::min(size, mData.size());
-			const unsigned char* rData = data + (size - rSize);
-
 			std::size_t bytesWritten = 0;
-			while (bytesWritten < rSize) {
-				std::size_t nextByte = (mLastByte + 1) % mData.size();
-				std::size_t bytesToCopy = std::min(mData.size() - nextByte, rSize - bytesWritten);
-				std::memcpy(&mData[nextByte], rData + bytesWritten, bytesToCopy);
+			std::size_t wSize = std::min(size, mData.size() - mNumBytes);
 
-				std::size_t previousLastByte = mLastByte;
-				mLastByte = (mLastByte + bytesToCopy) % mData.size();
-				if ((mFirstByte <= mLastByte)
-					&& ((mFirstByte >= previousLastByte) || (mLastByte <= previousLastByte))
-				) {
-					mFirstByte = (mLastByte + 1) % mData.size();
-				}
+			// Copy to the last part of the circular buffer
+			std::size_t mNextByte = (mFirstByte + mNumBytes) % mData.size();
+			if (mFirstByte < mNextByte) {
+				std::size_t bytesToCopy = std::min(mData.size() - mNextByte, wSize);
+				std::memcpy(&mData[mNextByte], data, bytesToCopy);
 
 				bytesWritten += bytesToCopy;
+				mNumBytes += bytesToCopy;
+				mNextByte = (mFirstByte + mNumBytes) % mData.size();
 			}
+
+			// Copy to the first part of the circular buffer
+			std::size_t bytesToCopy = wSize - bytesWritten;
+			std::memcpy(&mData[mNextByte], data + bytesWritten, bytesToCopy);
+
+			bytesWritten += bytesToCopy;
+			mNumBytes += bytesToCopy;
+
+			return bytesWritten;
 		};
 	};
 
@@ -304,8 +312,8 @@ namespace se::audio {
 	{
 		std::unique_lock lock(mMaDataSource->mutex);
 
-		std::size_t byteToWrite = numSamples * mMaDataSource->numChannels * mMaDataSource->sampleSize;
-		mMaDataSource->buffer.write(reinterpret_cast<const unsigned char*>(data), byteToWrite);
+		std::size_t bytesToWrite = numSamples * mMaDataSource->numChannels * mMaDataSource->sampleSize;
+		mMaDataSource->buffer.write(reinterpret_cast<const unsigned char*>(data), bytesToWrite);
 
 		return *this;
 	}
