@@ -1,9 +1,9 @@
-#ifndef SEAUDIO_I_DATA_SOURCE_H
-#define SEAUDIO_I_DATA_SOURCE_H
+#ifndef SAUDIO_I_DATA_SOURCE_H
+#define SAUDIO_I_DATA_SOURCE_H
 
 typedef void ma_data_source;
 
-namespace se::audio {
+namespace saudio {
 
 	/**
 	 * Class IDataSource, a data source is an object used to create, delete and
@@ -29,4 +29,4 @@ namespace se::audio {
 
 }
 
-#endif		// SEAUDIO_I_DATA_SOURCE_H
+#endif		// SAUDIO_I_DATA_SOURCE_H

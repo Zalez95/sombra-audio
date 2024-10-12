@@ -1,12 +1,12 @@
-#ifndef SEAUDIO_FILE_DATA_SOURCE_H
-#define SEAUDIO_FILE_DATA_SOURCE_H
+#ifndef SAUDIO_FILE_DATA_SOURCE_H
+#define SAUDIO_FILE_DATA_SOURCE_H
 
 #include <memory>
 #include "IDataSource.h"
 
 struct ma_sound;
 
-namespace se::audio {
+namespace saudio {
 
 	class AudioEngine;
 
@@ -43,4 +43,4 @@ namespace se::audio {
 
 }
 
-#endif		// SEAUDIO_FILE_DATA_SOURCE_H
+#endif		// SAUDIO_FILE_DATA_SOURCE_H

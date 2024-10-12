@@ -1,7 +1,7 @@
-#ifndef SEAUDIO_CONSTANTS_H
-#define SEAUDIO_CONSTANTS_H
+#ifndef SAUDIO_CONSTANTS_H
+#define SAUDIO_CONSTANTS_H
 
-namespace se::audio {
+namespace saudio {
 
 	enum class Format : unsigned char
 	{
@@ -43,4 +43,4 @@ namespace se::audio {
 
 }
 
-#endif		// SEAUDIO_CONSTANTS_H
+#endif		// SAUDIO_CONSTANTS_H

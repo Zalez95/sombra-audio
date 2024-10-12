@@ -1,10 +1,10 @@
-#ifndef SEAUDIO_MAWRAPPER_H
-#define SEAUDIO_MAWRAPPER_H
+#ifndef SAUDIO_MAWRAPPER_H
+#define SAUDIO_MAWRAPPER_H
 
 #include <miniaudio.h>
-#include "Constants.h"
+#include "saudio/Constants.h"
 
-namespace se::audio {
+namespace saudio {
 
 	constexpr ma_format toMAFormat(Format format)
 	{
@@ -62,4 +62,4 @@ namespace se::audio {
 
 }
 
-#endif		// SEAUDIO_MAWRAPPER_H
+#endif		// SAUDIO_MAWRAPPER_H

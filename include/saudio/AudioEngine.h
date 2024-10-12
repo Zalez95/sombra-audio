@@ -1,5 +1,5 @@
-#ifndef SEAUDIO_AUDIO_ENGINE_H
-#define SEAUDIO_AUDIO_ENGINE_H
+#ifndef SAUDIO_AUDIO_ENGINE_H
+#define SAUDIO_AUDIO_ENGINE_H
 
 #include <glm/glm.hpp>
 #include "Context.h"
@@ -7,7 +7,7 @@
 struct ma_resource_manager;
 struct ma_engine;
 
-namespace se::audio {
+namespace saudio {
 
 	/**
 	 * Class AudioEngine, It's the class used to prepare the audio devices for
@@ -134,7 +134,7 @@ namespace se::audio {
 		 * @return	a reference to the current AudioEngine object */
 		AudioEngine& setListenerVelocity(const glm::vec3& velocity);
 
-		/** @copydoc se::audio::AudioEngine::onDeviceData() */
+		/** @copydoc saudio::AudioEngine::onDeviceData() */
 		virtual void onDeviceData(
 			void* output, const void* input, unsigned int frameCount
 		) override;
@@ -142,4 +142,4 @@ namespace se::audio {
 
 }
 
-#endif		// SEAUDIO_AUDIO_ENGINE_H
+#endif		// SAUDIO_AUDIO_ENGINE_H

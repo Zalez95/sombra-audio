@@ -1,5 +1,5 @@
-#ifndef SEAUDIO_SOUND_H
-#define SEAUDIO_SOUND_H
+#ifndef SAUDIO_SOUND_H
+#define SAUDIO_SOUND_H
 
 #include <memory>
 #include <glm/glm.hpp>
@@ -7,7 +7,7 @@
 struct ma_sound;
 struct ma_engine;
 
-namespace se::audio {
+namespace saudio {
 
 	class IDataSource;
 	class AudioEngine;
@@ -189,4 +189,4 @@ namespace se::audio {
 
 }
 
-#endif		// SEAUDIO_SOUND_H
+#endif		// SAUDIO_SOUND_H

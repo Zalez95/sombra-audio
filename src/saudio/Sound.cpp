@@ -1,11 +1,11 @@
 #include <string>
 #include <iostream>
 #include <miniaudio.h>
-#include "Sound.h"
-#include "IDataSource.h"
-#include "AudioEngine.h"
+#include "saudio/Sound.h"
+#include "saudio/IDataSource.h"
+#include "saudio/AudioEngine.h"
 
-namespace se::audio {
+namespace saudio {
 
 	Sound::Sound(AudioEngine* audioEngine)
 	{

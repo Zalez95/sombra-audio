@@ -3,11 +3,11 @@
 #include <iostream>
 #include <algorithm>
 #include <miniaudio.h>
-#include "StreamDataSource.h"
-#include "Context.h"
-#include "MAWrapper.h"
+#include "saudio/StreamDataSource.h"
+#include "saudio/Context.h"
+#include "saudio/MAWrapper.h"
 
-namespace se::audio {
+namespace saudio {
 
 	class StreamDataSource::CircularBuffer
 	{

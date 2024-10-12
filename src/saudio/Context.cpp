@@ -2,10 +2,10 @@
 #include <algorithm>
 #define MINIAUDIO_IMPLEMENTATION
 #include <miniaudio.h>
-#include "Context.h"
+#include "saudio/Context.h"
 #include "MAWrapper.h"
 
-namespace se::audio {
+namespace saudio {
 
 	struct Context::Impl
 	{

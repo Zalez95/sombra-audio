@@ -1,11 +1,11 @@
-#ifndef SEAUDIO_STREAM_DATA_SOURCE_H
-#define SEAUDIO_STREAM_DATA_SOURCE_H
+#ifndef SAUDIO_STREAM_DATA_SOURCE_H
+#define SAUDIO_STREAM_DATA_SOURCE_H
 
 #include <memory>
 #include "IDataSource.h"
 #include "Constants.h"
 
-namespace se::audio {
+namespace saudio {
 
 	class AudioEngine;
 
@@ -85,4 +85,4 @@ namespace se::audio {
 
 }
 
-#endif		// SEAUDIO_STREAM_DATA_SOURCE_H
+#endif		// SAUDIO_STREAM_DATA_SOURCE_H

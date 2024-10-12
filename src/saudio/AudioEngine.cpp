@@ -3,10 +3,10 @@
 #include <algorithm>
 #include <miniaudio.h>
 #include <stdext/PackedVector.h>
-#include "Context.h"
-#include "AudioEngine.h"
+#include "saudio/Context.h"
+#include "saudio/AudioEngine.h"
 
-namespace se::audio {
+namespace saudio {
 
 	static constexpr ma_format kDecodeFormat = ma_format_f32;
 	static constexpr uint32_t kDecodeChannels = 0;				// native channel count

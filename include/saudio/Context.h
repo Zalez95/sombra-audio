@@ -1,5 +1,5 @@
-#ifndef SEAUDIO_CONTEXT_H
-#define SEAUDIO_CONTEXT_H
+#ifndef SAUDIO_CONTEXT_H
+#define SAUDIO_CONTEXT_H
 
 #include <memory>
 #include <vector>
@@ -8,7 +8,7 @@
 struct ma_context;
 struct ma_device;
 
-namespace se::audio {
+namespace saudio {
 
 	/**
 	 * Class LogHandler, it's the class that must be inherited from if someone
@@ -170,4 +170,4 @@ namespace se::audio {
 
 }
 
-#endif		// SEAUDIO_CONTEXT_H
+#endif		// SAUDIO_CONTEXT_H

@@ -1,9 +1,9 @@
 #include <iostream>
 #include <miniaudio.h>
-#include "FileDataSource.h"
-#include "AudioEngine.h"
+#include "saudio/FileDataSource.h"
+#include "saudio/AudioEngine.h"
 
-namespace se::audio {
+namespace saudio {
 
 	FileDataSource::FileDataSource(AudioEngine& engine, const char* path) : IDataSource()
 	{
