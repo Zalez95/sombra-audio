@@ -1,11 +1,11 @@
 #include <mutex>
 #include <cstring>
-#include <iostream>
 #include <algorithm>
 #include <miniaudio.h>
 #include "saudio/StreamDataSource.h"
 #include "saudio/Context.h"
 #include "saudio/MAWrapper.h"
+#include "LogWrapper.h"
 
 namespace saudio {
 
@@ -140,11 +140,11 @@ namespace saudio {
 
 		ma_result result = ma_data_source_init(&baseConfig, &base);
 		if (result != MA_SUCCESS) {
-			Context::getLogHandler()->error("Failed to initialize the DataSource");
+			SAUDIO_ERROR_LOG << "Failed to initialize the DataSource";
 			return;
 		}
 
-		std::cout << "Created the base data source " << &base << std::endl;
+		SAUDIO_DEBUG_LOG << "Created the base data source " << &base;
 	}
 
 
@@ -223,7 +223,7 @@ namespace saudio {
 	StreamDataSource::StreamDataSource(std::size_t bufferedSamples) : IDataSource()
 	{
 		if (bufferedSamples < 2) {
-			Context::getLogHandler()->error("The number of bufferedSamples must be at least 2");
+			SAUDIO_ERROR_LOG << "The number of bufferedSamples must be at least 2";
 			return;
 		}
 

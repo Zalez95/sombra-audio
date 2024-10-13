@@ -1,9 +1,8 @@
-#include <string>
-#include <iostream>
 #include <miniaudio.h>
 #include "saudio/Sound.h"
 #include "saudio/IDataSource.h"
 #include "saudio/AudioEngine.h"
+#include "LogWrapper.h"
 
 namespace saudio {
 
@@ -13,7 +12,7 @@ namespace saudio {
 			initInternal(audioEngine->getMAEngine());
 		}
 		else {
-			Context::getLogHandler()->debug("No engine provided, no Sound initialized");
+			SAUDIO_DEBUG_LOG << "No engine provided, no Sound initialized";
 		}
 	}
 
@@ -47,12 +46,12 @@ namespace saudio {
 		ma_engine* engine = ma_sound_get_engine(other.mSound.get());
 		ma_result res = ma_sound_init_copy(engine, other.mSound.get(), 0, nullptr, mSound.get());
 		if (res != MA_SUCCESS) {
-			Context::getLogHandler()->error("operator= Failed to create the sound");
+			SAUDIO_ERROR_LOG << "operator= Failed to create the sound";
 			mSound = nullptr;
 			return *this;
 		}
 
-		std::cout << "operator= Created Sound " << mSound.get() << std::endl;
+		SAUDIO_DEBUG_LOG << "operator= Created Sound " << mSound.get();
 
 		return *this;
 	}
@@ -190,7 +189,7 @@ namespace saudio {
 	}
 
 
-	void Sound::bind(IDataSource* source)
+	Sound& Sound::bind(IDataSource* source)
 	{
 		ma_engine* engine = ma_sound_get_engine(mSound.get());
 		ma_data_source* dataSource = source->getMADataSource();
@@ -199,11 +198,11 @@ namespace saudio {
 		other.mSound = std::make_unique<ma_sound>();
 		ma_result res = ma_sound_init_from_data_source(engine, dataSource, 0, nullptr, other.mSound.get());
 		if (res != MA_SUCCESS) {
-			Context::getLogHandler()->error("bind: Failed to create the sound");
-			return;
+			SAUDIO_ERROR_LOG << "bind: Failed to create the sound";
+			return *this;
 		}
 
-		std::cout << "bind: Created Sound " << other.mSound.get() << " with DataSource " << dataSource << std::endl;
+		SAUDIO_DEBUG_LOG << "bind: Created Sound " << other.mSound.get() << " with DataSource " << dataSource;
 
 		other.setPosition( getPosition() );
 		other.setOrientation( getOrientation() );
@@ -216,16 +215,20 @@ namespace saudio {
 		other.setLooping( isLooping() );
 
 		*this = std::move(other);
+
+		return *this;
 	}
 
 
-	void Sound::unbind()
+	Sound& Sound::unbind()
 	{
 		ma_engine* engine = ma_sound_get_engine(mSound.get());
 
 		stop();
 		uninitInternal();
 		initInternal(engine);
+
+		return *this;
 	}
 
 
@@ -263,13 +266,13 @@ namespace saudio {
 
 		ma_result res = ma_sound_init_ex(engine, &soundConfig, mSound.get());
 		if (res != MA_SUCCESS) {
-			Context::getLogHandler()->error("initInternal: Failed to create the sound");
+			SAUDIO_ERROR_LOG << "initInternal: Failed to create the sound";
 			mSound = nullptr;
 			return false;
 		}
 		ma_sound_stop(mSound.get());
 
-		std::cout << "initInternal: Created Sound " << mSound.get() << std::endl;
+		SAUDIO_DEBUG_LOG << "initInternal: Created Sound " << mSound.get();
 
 		return true;
 	}
@@ -278,7 +281,7 @@ namespace saudio {
 	void Sound::uninitInternal()
 	{
 		ma_sound_uninit(mSound.get());
-		std::cout << "Deleted Sound " << mSound.get() << std::endl;
+		SAUDIO_DEBUG_LOG << "Deleted Sound " << mSound.get();
 		mSound = nullptr;
 	}
 

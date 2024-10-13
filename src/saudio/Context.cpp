@@ -1,9 +1,9 @@
-#include <string>
 #include <algorithm>
 #define MINIAUDIO_IMPLEMENTATION
 #include <miniaudio.h>
 #include "saudio/Context.h"
 #include "MAWrapper.h"
+#include "LogWrapper.h"
 
 namespace saudio {
 
@@ -144,7 +144,7 @@ namespace saudio {
 			return false;
 		}
 
-		getLogHandler()->debug("started");
+		SAUDIO_INFO_LOG << "started";
 		return true;
 	}
 
@@ -163,7 +163,7 @@ namespace saudio {
 				}
 			}
 			else {
-				getLogHandler()->error("Failed to retrieve the devices");
+				SAUDIO_ERROR_LOG << "Failed to retrieve the devices";
 			}
 		}
 
@@ -173,13 +173,13 @@ namespace saudio {
 
 	bool Context::setDevice(std::size_t deviceId, const DeviceConfig& config)
 	{
-		getLogHandler()->debug(("setDevice(" + std::to_string(deviceId) + ")").c_str());
+		SAUDIO_DEBUG_LOG << "setDevice(" << deviceId << ")";
 
 		ma_device_info* deviceInfos;
 		ma_uint32 deviceCount;
 		ma_result result = ma_context_get_devices(getMAContext(), &deviceInfos, &deviceCount, nullptr, nullptr);
 		if (result != MA_SUCCESS) {
-			getLogHandler()->error("Failed to retrieve the devices");
+			SAUDIO_ERROR_LOG << "Failed to retrieve the devices";
 			return false;
 		}
 
@@ -195,14 +195,12 @@ namespace saudio {
 		sImpl->maDevice = std::make_unique<ma_device>();
 		result = ma_device_init(getMAContext(), &deviceConfig, sImpl->maDevice.get());
 		if (result != MA_SUCCESS) {
-			getLogHandler()->error(
-				(std::string("Failed to initialize the device ") + deviceInfos[deviceId].name).c_str()
-			);
+			SAUDIO_ERROR_LOG << "Failed to initialize the device " << deviceInfos[deviceId].name;
 			sImpl->maDevice = nullptr;
 			return false;
 		}
 
-		getLogHandler()->debug(("setDevice(" + std::to_string(deviceId) + ") end").c_str());
+		SAUDIO_DEBUG_LOG << "setDevice(" << deviceId << ") end";
 		return true;
 	}
 
@@ -237,7 +235,7 @@ namespace saudio {
 
 	void Context::stop()
 	{
-		getLogHandler()->debug("stop");
+		SAUDIO_INFO_LOG << "stop";
 
 		if (sImpl) {
 			delete sImpl;

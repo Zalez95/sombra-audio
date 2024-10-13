@@ -152,10 +152,10 @@ namespace saudio {
 		 * @param	source the IDataSource to bind to the current Sound
 		 * @note	this function will also stop the Sound from playing its
 		 *			old IDataSource */
-		void bind(IDataSource* source);
+		Sound& bind(IDataSource* source);
 
 		/** Stops and unbinds the Sound from its current Buffer */
-		void unbind();
+		Sound& unbind();
 
 		/** Starts playing the sound of its binded Buffer
 		 *

@@ -12,6 +12,7 @@ set(SOMBRA_AUDIO_VERSION "${SOMBRA_AUDIO_VERSION_MAJOR}.${SOMBRA_AUDIO_VERSION_M
 
 # SombraAudio Options
 option(SOMBRA_AUDIO_BUILD_DOC "Generate the SombraAudio documentation" ON)
+option(SOMBRA_AUDIO_BUILD_TEST "Generate the SombraAudio test program" ON)
 
 # Find the dependencies
 find_package(glm)
@@ -72,4 +73,8 @@ if(SOMBRA_AUDIO_BUILD_DOC AND DOXYGEN_FOUND)
 		WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/doc"
 		COMMENT "Generating API documentation with Doxygen"
 	)
+endif()
+
+if(SOMBRA_AUDIO_BUILD_TEST)
+	add_subdirectory("test")
 endif()

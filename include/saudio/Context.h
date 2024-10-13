@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <vector>
+#include <string>
 #include "Constants.h"
 
 struct ma_context;

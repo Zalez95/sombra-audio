@@ -11,9 +11,9 @@ class SombraAudioConan(ConanFile):
 	options = {
 		"shared" : [True, False],
 		"fPIC" : [True, False],
-		"tools" : [True, False]
+		"test" : [True, False]
 	}
-	default_options = {"shared": False, "fPIC": True, "tools" : False}
+	default_options = {"shared": False, "fPIC": True, "test" : False}
 
 	def requirements(self):
 		self.requires("glm/0.9.9.8", transitive_headers=True)
@@ -38,6 +38,7 @@ class SombraAudioConan(ConanFile):
 	def generate(self):
 		tc = CMakeToolchain(self)
 		tc.variables["SOMBRA_AUDIO_BUILD_DOC"] = False
+		tc.variables["SOMBRA_AUDIO_BUILD_TEST"] = self.options.test
 		tc.generate()
 		deps = CMakeDeps(self)
 		deps.generate()

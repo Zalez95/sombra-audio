@@ -1,10 +1,10 @@
-#include <string>
 #include <istream>
 #include <algorithm>
 #include <miniaudio.h>
 #include <stdext/PackedVector.h>
 #include "saudio/Context.h"
 #include "saudio/AudioEngine.h"
+#include "LogWrapper.h"
 
 namespace saudio {
 
@@ -224,7 +224,7 @@ namespace saudio {
 		mResourceManager = std::make_unique<ma_resource_manager>();
 		ma_result result = ma_resource_manager_init(&resourceManagerConfig, mResourceManager.get());
 		if (result != MA_SUCCESS) {
-			Context::getLogHandler()->error("ResourceManager creation error");
+			SAUDIO_ERROR_LOG << "ResourceManager creation error";
 			mResourceManager = nullptr;
 			return;
 		}
@@ -238,13 +238,13 @@ namespace saudio {
 		mEngine = std::make_unique<ma_engine>();
 		result = ma_engine_init(&engineConfig, mEngine.get());
 		if (result != MA_SUCCESS) {
-			Context::getLogHandler()->error("Engine creation error");
+			SAUDIO_ERROR_LOG << "Engine creation error";
 			mEngine = nullptr;
 			return;
 		}
 
 		if (!Context::addDeviceDataListener(this)) {
-			Context::getLogHandler()->error("Failed to add as a Device listener");
+			SAUDIO_ERROR_LOG << "Failed to add as a Device listener";
 			return;
 		}
 	}
