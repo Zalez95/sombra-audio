@@ -209,7 +209,7 @@ namespace saudio {
 	}
 
 
-	AudioEngine::AudioEngine(std::unique_ptr<IVFS> vfs)
+	AudioEngine::AudioEngine(Device& device, std::unique_ptr<IVFS> vfs) : mDevice(device)
 	{
 		ma_resource_manager_config resourceManagerConfig = ma_resource_manager_config_init();
 		resourceManagerConfig.pLog = static_cast<ma_log*>(Context::getMALog());
@@ -232,7 +232,7 @@ namespace saudio {
 		ma_engine_config engineConfig = ma_engine_config_init();
 		engineConfig.pResourceManager = mResourceManager.get();
 		engineConfig.pContext = Context::getMAContext();
-		engineConfig.pDevice = Context::getMADevice();
+		engineConfig.pDevice = mDevice.getMADevice();
 		engineConfig.listenerCount = 1;
 
 		mEngine = std::make_unique<ma_engine>();
@@ -243,7 +243,7 @@ namespace saudio {
 			return;
 		}
 
-		if (!Context::addDeviceDataListener(this)) {
+		if (!mDevice.addDeviceDataListener(this)) {
 			SAUDIO_ERROR_LOG << "Failed to add as a Device listener";
 			return;
 		}
@@ -252,7 +252,7 @@ namespace saudio {
 
 	AudioEngine::~AudioEngine()
 	{
-		Context::removeDeviceDataListener(this);
+		mDevice.removeDeviceDataListener(this);
 
 		if (mEngine) {
 			ma_engine_uninit(mEngine.get());
@@ -269,6 +269,12 @@ namespace saudio {
 	bool AudioEngine::good()
 	{
 		return mEngine && mResourceManager;
+	}
+
+
+	Device& AudioEngine::getDevice() const
+	{
+		return mDevice;
 	}
 
 

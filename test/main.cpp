@@ -49,25 +49,31 @@ int main()
 		return -1;
 	}
 
-	std::size_t defaultId = 0;
-	for (const auto& device : saudio::Context::getDevices()) {
-		if (device.isDefault) {
-			defaultId = device.id;
+	saudio::Device::DeviceConfig audioDeviceConfig;
+	std::unique_ptr<saudio::Device> device = nullptr;
+	for (const auto& deviceInfo : saudio::Device::getDeviceInfos()) {
+		if (deviceInfo.isDefault) {
+			device = std::make_unique<saudio::Device>(deviceInfo, audioDeviceConfig);
+			if (!device->good()) {
+				std::cerr << "Failed to create the Device" << std::endl;
+				saudio::Context::stop();
+				return -1;
+			}
+			break;
 		}
 	}
-
-	saudio::Context::DeviceConfig audioDeviceConfig;
-	if (!saudio::Context::setDevice(defaultId, audioDeviceConfig)) {
-		std::cerr << "Failed to set the audio Device" << std::endl;
+	if (!device) {
+		std::cerr << "Default device not found" << std::endl;
 		saudio::Context::stop();
 		return -1;
 	}
 
 	// Create the AudioEngine and Sound
-	auto audioEngine = std::make_unique<saudio::AudioEngine>();
+	auto audioEngine = std::make_unique<saudio::AudioEngine>(*device);
 	if (!audioEngine->good()) {
 		std::cerr << "Failed to Create the AudioEngine" << std::endl;
 		audioEngine = nullptr;
+		device = nullptr;
 		saudio::Context::stop();
 		return -1;
 	}
@@ -77,6 +83,7 @@ int main()
 		std::cerr << "Failed to Create the AudioEngine" << std::endl;
 		dataSource = nullptr;
 		audioEngine = nullptr;
+		device = nullptr;
 		saudio::Context::stop();
 		return -1;
 	}
@@ -87,6 +94,7 @@ int main()
 		sound = nullptr;
 		dataSource = nullptr;
 		audioEngine = nullptr;
+		device = nullptr;
 		saudio::Context::stop();
 		return -1;
 	}
@@ -110,16 +118,23 @@ int main()
 			} break;
 			case 2: {
 				std::cout << "Devices:" << std::endl;
-				for (const auto& device : saudio::Context::getDevices()) {
-					std::cout << "\t" << device.id << " " << device.name << " " << device.isDefault << std::endl;
+				for (const auto& device : saudio::Device::getDeviceInfos()) {
+					std::cout << "\t" << device.name << " " << device.isDefault << std::endl;
 				}
 			} break;
 			case 3: {
 				std::cin >> option;
-				saudio::Context::DeviceConfig audioDeviceConfig;
-				if (!saudio::Context::setDevice(option, audioDeviceConfig)) {
-					std::cerr << "Failed to set the audio Device" << std::endl;
-					stop = true;
+				auto infos = saudio::Device::getDeviceInfos();
+				if ((option >= 0) && (option < static_cast<int>(infos.size()))) {
+					auto device2 = std::make_unique<saudio::Device>(infos[option], audioDeviceConfig);
+					if (!device2->good()) {
+						std::cerr << "Failed to set the audio Device" << std::endl;
+						stop = true;
+					}
+					// TODO: update audio engine
+				}
+				else {
+					std::cerr << "Invalid device" << std::endl;
 				}
 			} break;
 			case 4: {
@@ -142,6 +157,7 @@ int main()
 	sound = nullptr;
 	dataSource = nullptr;
 	audioEngine = nullptr;
+	device = nullptr;
 	saudio::Context::stop();
 
 	return 0;

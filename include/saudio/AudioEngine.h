@@ -2,7 +2,7 @@
 #define SAUDIO_AUDIO_ENGINE_H
 
 #include <glm/glm.hpp>
-#include "Context.h"
+#include "Device.h"
 
 struct ma_resource_manager;
 struct ma_engine;
@@ -15,7 +15,7 @@ namespace saudio {
 	 * The properties of this Listener can be used to control from where we are
 	 * going to be listening the Sounds in this 3D audio scene.
 	 */
-	class AudioEngine : public Context::IDeviceDataListener
+	class AudioEngine : public Device::IDeviceDataListener
 	{
 	public:		// Nested Types
 		friend class Sound;
@@ -40,6 +40,9 @@ namespace saudio {
 		/** The id of the single listener in @see mEngine */
 		static constexpr unsigned int kListenerIndex = 0;
 
+		/** The device used by the engine */
+		Device& mDevice;
+
 		/** A pointer to the ResourceManager */
 		std::unique_ptr<ma_resource_manager> mResourceManager;
 
@@ -50,18 +53,22 @@ namespace saudio {
 		std::unique_ptr<MaVFS> mVFS;
 
 	public:		// Functions
-		/** Creates a new AudioEngine and initializes the device and context.
+		/** Creates a new AudioEngine
 		 *
+		 * @param	device the device that will be used by the Engine
 		 * @param	vfs a pointer to the VFS to use with the Engine for loading
 		 *			audio files (the OS one by default) */
-		AudioEngine(std::unique_ptr<IVFS> vfs = nullptr);
+		AudioEngine(Device& device, std::unique_ptr<IVFS> vfs = nullptr);
 
-		/** Class destructor. It releases the audio devices. */
+		/** Class destructor */
 		~AudioEngine();
 
 		/** @return	true if the AudioEngine was created successfully,
 		 *			false otherwise */
 		bool good();
+
+		/** @return	the Device used by the Engine */
+		Device& getDevice() const;
 
 		/** @return	a pointer to the miniaudio engine of the AudioEngine */
 		ma_engine* getMAEngine() const;

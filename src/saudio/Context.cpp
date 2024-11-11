@@ -1,8 +1,7 @@
-#include <algorithm>
+#include <memory>
 #define MINIAUDIO_IMPLEMENTATION
 #include <miniaudio.h>
 #include "saudio/Context.h"
-#include "MAWrapper.h"
 #include "LogWrapper.h"
 
 namespace saudio {
@@ -12,18 +11,11 @@ namespace saudio {
 		/** A pointer to the LogHandler that used for printing logs */
 		LogHandler* logHandler = nullptr;
 
-		/** The Listeners to notify when data is ready to be delivered to or
-		 * from the device */
-		std::vector<IDeviceDataListener*> deviceDataListeners;
-
 		/** The miniaudio log */
 		std::unique_ptr<ma_log> maLog;
 
 		/** The miniaudio context */
 		std::unique_ptr<ma_context> maContext;
-
-		/** A pointer to the Device used for playing the sound */
-		std::unique_ptr<ma_device> maDevice;
 
 		/** Creates a new Context Impl
 		 *
@@ -89,11 +81,6 @@ namespace saudio {
 
 	Context::Impl::~Impl()
 	{
-		if (maDevice) {
-			ma_device_uninit(maDevice.get());
-			maDevice = nullptr;
-		}
-
 		if (maContext) {
 			ma_context_uninit(maContext.get());
 			maContext = nullptr;
@@ -108,7 +95,7 @@ namespace saudio {
 
 	bool Context::good()
 	{
-		return getMAContext() && getMADevice();
+		return getMAContext();
 	}
 
 
@@ -130,12 +117,6 @@ namespace saudio {
 	}
 
 
-	ma_device* Context::getMADevice()
-	{
-		return sImpl? sImpl->maDevice.get() : nullptr;
-	}
-
-
 	bool Context::start(const ContextConfig& config)
 	{
 		sImpl = new Impl(config);
@@ -148,91 +129,6 @@ namespace saudio {
 		return true;
 	}
 
-
-	std::vector<Context::DeviceInfo> Context::getDevices()
-	{
-		std::vector<DeviceInfo> ret;
-
-		if (getMAContext()) {
-			ma_device_info* deviceInfos;
-			ma_uint32 deviceCount;
-			ma_result result = ma_context_get_devices(getMAContext(), &deviceInfos, &deviceCount, nullptr, nullptr);
-			if (result == MA_SUCCESS) {
-				for (ma_uint32 i = 0; i < deviceCount; ++i) {
-					ret.push_back({ i, deviceInfos[i].name, static_cast<bool>(deviceInfos[i].isDefault) });
-				}
-			}
-			else {
-				SAUDIO_ERROR_LOG << "Failed to retrieve the devices";
-			}
-		}
-
-		return ret;
-	}
-
-
-	bool Context::setDevice(std::size_t deviceId, const DeviceConfig& config)
-	{
-		SAUDIO_DEBUG_LOG << "setDevice(" << deviceId << ")";
-
-		ma_device_info* deviceInfos;
-		ma_uint32 deviceCount;
-		ma_result result = ma_context_get_devices(getMAContext(), &deviceInfos, &deviceCount, nullptr, nullptr);
-		if (result != MA_SUCCESS) {
-			SAUDIO_ERROR_LOG << "Failed to retrieve the devices";
-			return false;
-		}
-
-		ma_device_config deviceConfig;
-		deviceConfig = ma_device_config_init(ma_device_type_playback);
-		deviceConfig.playback.pDeviceID = &deviceInfos[deviceId].id;
-		deviceConfig.playback.format = toMAFormat(config.decodeFormat);
-		deviceConfig.playback.channels = config.decodeChannels;
-		deviceConfig.sampleRate = config.decodeSampleRate;
-		deviceConfig.dataCallback = &maDeviceDataCallback;
-		deviceConfig.pUserData = sImpl;
-
-		sImpl->maDevice = std::make_unique<ma_device>();
-		result = ma_device_init(getMAContext(), &deviceConfig, sImpl->maDevice.get());
-		if (result != MA_SUCCESS) {
-			SAUDIO_ERROR_LOG << "Failed to initialize the device " << deviceInfos[deviceId].name;
-			sImpl->maDevice = nullptr;
-			return false;
-		}
-
-		SAUDIO_DEBUG_LOG << "setDevice(" << deviceId << ") end";
-		return true;
-	}
-
-
-	bool Context::addDeviceDataListener(IDeviceDataListener* listener)
-	{
-		if (!listener || !good()) {
-			return false;
-		}
-
-		auto it = std::find(sImpl->deviceDataListeners.begin(), sImpl->deviceDataListeners.end(), listener);
-		if (it == sImpl->deviceDataListeners.end()) {
-			sImpl->deviceDataListeners.push_back(listener);
-		}
-
-		return true;
-	}
-
-
-	void Context::removeDeviceDataListener(IDeviceDataListener* listener)
-	{
-		if (!listener || !good()) {
-			return;
-		}
-
-		auto it = std::find(sImpl->deviceDataListeners.begin(), sImpl->deviceDataListeners.end(), listener);
-		if (it != sImpl->deviceDataListeners.end()) {
-			sImpl->deviceDataListeners.erase(it);
-		}
-	}
-
-
 	void Context::stop()
 	{
 		SAUDIO_INFO_LOG << "stop";
@@ -240,15 +136,6 @@ namespace saudio {
 		if (sImpl) {
 			delete sImpl;
 			sImpl = nullptr;
-		}
-	}
-
-// Private functions
-	void Context::maDeviceDataCallback(ma_device* device, void* output, const void* input, unsigned int frameCount)
-	{
-		Impl* impl = static_cast<Impl*>(device->pUserData);
-		for (auto listener : impl->deviceDataListeners) {
-			listener->onDeviceData(output, input, frameCount);
 		}
 	}
 
