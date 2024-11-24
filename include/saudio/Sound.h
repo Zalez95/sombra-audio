@@ -42,6 +42,15 @@ namespace saudio {
 		Sound& operator=(const Sound& other);
 		Sound& operator=(Sound&& other);
 
+		/** Creates a copy of the given Sound that uses the given AudioEngine
+		 *
+		 * @param	other the Sound to copy
+		 * @param	audioEngine a pointer to the AudioEngine that will hold the
+		 *			new Sound. If no AudioEngine is provided the Sound won't be
+		 *			initialized and @see good will return false
+		 * @return	the new Sound */
+		static Sound copy(const Sound& other, AudioEngine* audioEngine);
+
 		/** @return	true if the Sound was created and initialized
 		 *			successfully */
 		bool good() const;
@@ -177,11 +186,20 @@ namespace saudio {
 	private:
 		/** Initializes the Sound with the given miniaudio engine
 		 *
-		 * @param	engine a pointer to the miniaudio AudioEngine used for
+		 * @param	engine a pointer to the miniaudio engine used for
 		 *			creating the sound
 		 * @return	true if the Sound was initialized successfully, false
 		 *			otherwise */
 		bool initInternal(ma_engine* engine);
+
+		/** Initializes the Sound with the given miniaudio sound and engine
+		 *
+		 * @param	sound a pointer to the miniaudio sound to copy
+		 * @param	engine a pointer to the miniaudio engine used for
+		 *			creating the sound
+		 * @return	true if the Sound was initialized successfully, false
+		 *			otherwise */
+		bool copyInternal(ma_sound* other, ma_engine* engine);
 
 		/** Unititializes the Sound */
 		void uninitInternal();

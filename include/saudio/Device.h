@@ -24,9 +24,9 @@ namespace saudio {
 			bool isDefault;		///< If it's the default device or not
 		};
 
-		/** Struct DeviceConfig, holds all the parameters needed for
-		 * setting the Device */
-		struct DeviceConfig
+		/** Struct Config, holds all the parameters needed for
+		 * setting up the Device */
+		struct Config
 		{
 			Format decodeFormat = Format::f32;
 			uint32_t decodeChannels = 0;
@@ -63,9 +63,9 @@ namespace saudio {
 	public:		// Functions
 		/** Creates a new Device
 		 *
-		 * @param	info the DeviceInfo of the device to create
-		 * @param	config the parameters of the device to create */
-		Device(const DeviceInfo& deviceInfo, const DeviceConfig& config);
+		 * @param	info the DeviceInfo of the Device to create
+		 * @param	config the parameters of the Device to create */
+		Device(const DeviceInfo& deviceInfo, const Config& config);
 
 		/** Class destructor */
 		~Device();

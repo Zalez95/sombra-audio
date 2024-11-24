@@ -5,13 +5,9 @@
 #include "saudio/Context.h"
 #include "saudio/AudioEngine.h"
 #include "LogWrapper.h"
+#include "MAWrapper.h"
 
 namespace saudio {
-
-	static constexpr ma_format kDecodeFormat = ma_format_f32;
-	static constexpr uint32_t kDecodeChannels = 0;				// native channel count
-	static constexpr uint32_t kDecodeSampleRate = 48000;
-
 
 	struct AudioEngine::MaVFS
 	{
@@ -23,10 +19,10 @@ namespace saudio {
 		};
 
 		ma_vfs_callbacks callbacks;
-		std::unique_ptr<IVFS> vfs;
+		IVFS* vfs;
 		stdext::PackedVector<StreamData> streams;
 
-		MaVFS(std::unique_ptr<IVFS> vfs);
+		MaVFS(IVFS* vfs);
 
 		static ma_result onOpen(ma_vfs* pVFS, const char* pFilePath, ma_uint32 openMode, ma_vfs_file* pFile);
 		static ma_result onOpenW(ma_vfs* pVFS, const wchar_t* pFilePath, ma_uint32 openMode, ma_vfs_file* pFile);
@@ -42,7 +38,7 @@ namespace saudio {
 	};
 
 
-	AudioEngine::MaVFS::MaVFS(std::unique_ptr<IVFS> vfs) : vfs(std::move(vfs))
+	AudioEngine::MaVFS::MaVFS(IVFS* vfs) : vfs(vfs)
 	{
 		callbacks = {
 			&onOpen, &onOpenW, &onClose, &onRead, &onWrite,
@@ -209,15 +205,15 @@ namespace saudio {
 	}
 
 
-	AudioEngine::AudioEngine(Device& device, std::unique_ptr<IVFS> vfs) : mDevice(device)
+	AudioEngine::AudioEngine(Device& device, const AudioEngine::Config& config) : mDevice(device)
 	{
 		ma_resource_manager_config resourceManagerConfig = ma_resource_manager_config_init();
 		resourceManagerConfig.pLog = static_cast<ma_log*>(Context::getMALog());
-		resourceManagerConfig.decodedFormat = kDecodeFormat;
-		resourceManagerConfig.decodedChannels = kDecodeChannels;
-		resourceManagerConfig.decodedSampleRate = kDecodeSampleRate;
-		if (vfs) {
-			mVFS = std::make_unique<MaVFS>(std::move(vfs));
+		resourceManagerConfig.decodedFormat = toMAFormat(config.decodeFormat);
+		resourceManagerConfig.decodedChannels = config.decodeChannels;
+		resourceManagerConfig.decodedSampleRate = config.decodeSampleRate;
+		if (config.vfs) {
+			mVFS = std::make_unique<MaVFS>(config.vfs);
 			resourceManagerConfig.pVFS = static_cast<ma_vfs*>(mVFS.get());
 		}
 

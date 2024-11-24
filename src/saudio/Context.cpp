@@ -20,7 +20,7 @@ namespace saudio {
 		/** Creates a new Context Impl
 		 *
 		 * @param	config the parameters of the Context Impl */
-		Impl(const ContextConfig& config);
+		Impl(const Context::Config& config);
 
 		/** Class destructor */
 		~Impl();
@@ -28,7 +28,7 @@ namespace saudio {
 
 
 	Context::Impl* Context::sImpl = nullptr;
-	LogHandler Context::ContextConfig::sDefaultLogHandler = {};
+	LogHandler Context::Context::Config::sDefaultLogHandler = {};
 
 
 	static void myMALogCallback(void*, ma_uint32 level, const char* pMessage)
@@ -53,7 +53,7 @@ namespace saudio {
 	}
 
 
-	Context::Impl::Impl(const ContextConfig& config) : logHandler(config.logHandler)
+	Context::Impl::Impl(const Context::Config& config) : logHandler(config.logHandler)
 	{
 		// Create the miniaudio log
 		maLog = std::make_unique<ma_log>();
@@ -117,7 +117,7 @@ namespace saudio {
 	}
 
 
-	bool Context::start(const ContextConfig& config)
+	bool Context::start(const Context::Config& config)
 	{
 		sImpl = new Impl(config);
 		if (!getMAContext()) {

@@ -7,7 +7,7 @@
 
 namespace saudio {
 
-	Device::Device(const DeviceInfo& info, const DeviceConfig& config)
+	Device::Device(const DeviceInfo& info, const Config& config)
 	{
 		SAUDIO_DEBUG_LOG << "init \"" << info.name << "\"";
 

@@ -47,9 +47,9 @@ namespace saudio {
 	class Context
 	{
 	public:		// Nested types
-		/** Struct ContextConfig, holds all the parameters needed for
+		/** Struct Config, holds all the parameters needed for
 		 * initializing the Context */
-		struct ContextConfig
+		struct Config
 		{
 			/** The default LogHandler */
 			static LogHandler sDefaultLogHandler;
@@ -84,7 +84,7 @@ namespace saudio {
 		 *
 		 * @param	config the parameters of the Context
 		 * @return	true on success, false otherwise */
-		static bool start(const ContextConfig& config);
+		static bool start(const Config& config);
 
 		/** Destroys the Context instance and releases all the
 		 * resources */

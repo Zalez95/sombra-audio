@@ -42,14 +42,14 @@ int main()
 	AudioLogHandler sAudioLogHandler;
 
 	// Create the audio context
-	saudio::Context::ContextConfig audioContextConfig;
+	saudio::Context::Config audioContextConfig;
 	audioContextConfig.logHandler = &sAudioLogHandler;
 	if (!saudio::Context::start(audioContextConfig)) {
 		std::cerr << "Failed to start the audio Context" << std::endl;
 		return -1;
 	}
 
-	saudio::Device::DeviceConfig audioDeviceConfig;
+	saudio::Device::Config audioDeviceConfig;
 	std::unique_ptr<saudio::Device> device = nullptr;
 	for (const auto& deviceInfo : saudio::Device::getDeviceInfos()) {
 		if (deviceInfo.isDefault) {
@@ -69,7 +69,8 @@ int main()
 	}
 
 	// Create the AudioEngine and Sound
-	auto audioEngine = std::make_unique<saudio::AudioEngine>(*device);
+	saudio::AudioEngine::Config audioEngineConfig;
+	auto audioEngine = std::make_unique<saudio::AudioEngine>(*device, audioEngineConfig);
 	if (!audioEngine->good()) {
 		std::cerr << "Failed to Create the AudioEngine" << std::endl;
 		audioEngine = nullptr;

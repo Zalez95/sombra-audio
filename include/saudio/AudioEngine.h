@@ -33,6 +33,19 @@ namespace saudio {
 				const char* path, std::unique_ptr<std::istream>& stream
 			) = 0;
 		};
+
+		/** Struct Config, holds all the parameters needed for
+		 * initializing the AudioEngine */
+		struct Config
+		{
+			/** A pointer to the VFS to use with the Engine for loading
+			 * audio files (the OS one by default) */
+			IVFS* vfs = nullptr;
+
+			Format decodeFormat = Format::f32;
+			uint32_t decodeChannels = 0;
+			uint32_t decodeSampleRate = 48000;
+		};
 	private:
 		struct MaVFS;
 
@@ -55,10 +68,9 @@ namespace saudio {
 	public:		// Functions
 		/** Creates a new AudioEngine
 		 *
-		 * @param	device the device that will be used by the Engine
-		 * @param	vfs a pointer to the VFS to use with the Engine for loading
-		 *			audio files (the OS one by default) */
-		AudioEngine(Device& device, std::unique_ptr<IVFS> vfs = nullptr);
+		 * @param	device the device that will be used by the AudioEngine
+		 * @param	config the parameters of the new AudioEngine */
+		AudioEngine(Device& device, const Config& config);
 
 		/** Class destructor */
 		~AudioEngine();

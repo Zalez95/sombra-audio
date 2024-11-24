@@ -42,17 +42,9 @@ namespace saudio {
 			uninitInternal();
 		}
 
-		mSound = std::make_unique<ma_sound>();
+		ma_sound* sound = other.mSound.get();
 		ma_engine* engine = ma_sound_get_engine(other.mSound.get());
-		ma_result res = ma_sound_init_copy(engine, other.mSound.get(), 0, nullptr, mSound.get());
-		if (res != MA_SUCCESS) {
-			SAUDIO_ERROR_LOG << "operator= Failed to create the sound";
-			mSound = nullptr;
-			return *this;
-		}
-
-		SAUDIO_DEBUG_LOG << "operator= Created Sound " << mSound.get();
-
+		copyInternal(sound, engine);
 		return *this;
 	}
 
@@ -67,6 +59,17 @@ namespace saudio {
 		mSound = std::move(other.mSound);
 
 		return *this;
+	}
+
+
+	Sound Sound::copy(const Sound& other, AudioEngine* audioEngine)
+	{
+		ma_sound* sound = other.mSound.get();
+		ma_engine* engine = audioEngine->getMAEngine();
+
+		Sound ret;
+		ret.copyInternal(sound, engine);
+		return ret;
 	}
 
 
@@ -198,11 +201,11 @@ namespace saudio {
 		other.mSound = std::make_unique<ma_sound>();
 		ma_result res = ma_sound_init_from_data_source(engine, dataSource, 0, nullptr, other.mSound.get());
 		if (res != MA_SUCCESS) {
-			SAUDIO_ERROR_LOG << "bind: Failed to create the sound";
+			SAUDIO_ERROR_LOG << "Failed to create the sound";
 			return *this;
 		}
 
-		SAUDIO_DEBUG_LOG << "bind: Created Sound " << other.mSound.get() << " with DataSource " << dataSource;
+		SAUDIO_DEBUG_LOG << "Created Sound " << other.mSound.get() << " with DataSource " << dataSource;
 
 		other.setPosition( getPosition() );
 		other.setOrientation( getOrientation() );
@@ -266,14 +269,28 @@ namespace saudio {
 
 		ma_result res = ma_sound_init_ex(engine, &soundConfig, mSound.get());
 		if (res != MA_SUCCESS) {
-			SAUDIO_ERROR_LOG << "initInternal: Failed to create the sound";
+			SAUDIO_ERROR_LOG << "Failed to create the sound";
 			mSound = nullptr;
 			return false;
 		}
 		ma_sound_stop(mSound.get());
 
-		SAUDIO_DEBUG_LOG << "initInternal: Created Sound " << mSound.get();
+		SAUDIO_DEBUG_LOG << "Created Sound " << mSound.get();
+		return true;
+	}
 
+
+	bool Sound::copyInternal(ma_sound* other, ma_engine* engine)
+	{
+		mSound = std::make_unique<ma_sound>();
+		ma_result res = ma_sound_init_copy(engine, other, 0, nullptr, mSound.get());
+		if (res != MA_SUCCESS) {
+			SAUDIO_ERROR_LOG << "Failed to create the sound";
+			mSound = nullptr;
+			return false;
+		}
+
+		SAUDIO_DEBUG_LOG << "Created Sound " << mSound.get();
 		return true;
 	}
 
