@@ -1,7 +1,7 @@
 #include <istream>
 #include <algorithm>
 #include <miniaudio.h>
-#include <stdext/PackedVector.h>
+#include <stdext/ReleaseVector.h>
 #include "saudio/Context.h"
 #include "saudio/AudioEngine.h"
 #include "LogWrapper.h"
@@ -20,7 +20,7 @@ namespace saudio {
 
 		ma_vfs_callbacks callbacks;
 		IVFS* vfs;
-		stdext::PackedVector<StreamData> streams;
+		stdext::ReleaseVector<StreamData> streams;
 
 		MaVFS(IVFS* vfs);
 
